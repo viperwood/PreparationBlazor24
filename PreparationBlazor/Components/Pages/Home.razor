@@ -1,0 +1,123 @@
+﻿@page "/Registration"
+@using System.Text.Json.Serialization
+@using Newtonsoft.Json
+@rendermode InteractiveServer
+
+<PageTitle>Registration</PageTitle>
+
+@if (_genders == null)
+{
+    <p>...Loading</p>
+}
+else
+{
+    <div style="display: grid; grid-template-rows: 20vh 1fr 20vh; grid-template-columns: 1fr 1fr 1fr; background: linear-gradient(to top, blue, rebeccapurple)">
+        <div style="grid-row: 1; grid-column: 2; display: flex; text-align: center; vertical-align: center">
+            <h3 style="color: white; margin: auto">Регистрация</h3>
+        </div>
+        <div style="grid-column: 2; grid-row: 2; display: block; background: white; border-radius: 100px;">
+            <b style="display: block;  margin: 40px">ФИО:</b>
+            <input placeholder="ФИО:" @bind="_fio" style="display: block;  margin: 40px; border-radius: 30px">
+            <b style="display: block;  margin: 40px">Серия паспорта:</b>
+            <input placeholder="Серия паспорта:" @bind="_pasportS" style="display: block;  margin: 40px; border-radius: 30px">
+            <b style="display: block;  margin: 40px">Номер паспорта:</b>
+            <input placeholder="Номер паспорта:" @bind="_pasportN" style="display: block;  margin: 40px; border-radius: 30px">
+            <b style="display: block;  margin: 40px">Номер полиса:</b>
+            <input placeholder="Номер полиса:" @bind="_numberpolis" style="display: block;  margin: 40px; border-radius: 30px">
+            <b style="display: block;  margin: 40px">День рождения</b>
+            <InputDate Type="InputDateType.Date" @bind-Value="@_birthday" style="display: block;  margin: 40px; border-radius: 30px"/>
+            <b style="display: block;  margin: 40px">Дата окончания действия страхового полиса пациента</b>
+            <InputDate Type="InputDateType.Date" @bind-Value="@_dataexpirationinsurancepolisy" style="display: block;  margin: 40px; border-radius: 30px"/>
+            <b style="display: block;  margin: 40px">Срок действия медецинского полиса</b>
+            <InputDate Type="InputDateType.Date" @bind-Value="@_policyvalidity" style="display: block;  margin: 40px; border-radius: 30px"/>
+            <b style="display: block;  margin: 40px">Дата выдачи медицинской карты пациента</b>
+            <InputDate Type="InputDateType.Date" @bind-Value="@_dataissuemc" style="display: block;  margin: 40px; border-radius: 30px"/>
+            <b style="display: block;  margin: 40px">Адрес:</b>
+            <input placeholder="Адрес:" @bind="_adres" style="display: block;  margin: 40px; border-radius: 30px">
+            <b style="display: block;  margin: 40px">Телефон:</b>
+            <input placeholder="Телефон:" @bind="_phone" style="display: block;  margin: 40px; border-radius: 30px">
+            <b style="display: block;  margin: 40px">email:</b>
+            <input type="email" placeholder="E-mail:" @bind="_email" style="display: block;  margin: 40px; border-radius: 30px">
+            <b style="display: block;  margin: 40px">Пол:</b>
+            <select class="select-element" @bind="@_gender" style="display: block;  margin: 40px; border-radius: 30px">
+                @foreach (var element in _genders)
+                {
+                    <option>@element.gendername</option>
+                }
+            </select>
+            <b style="display: block;  margin: 40px">Место работы:</b>
+            <select class="select-element" @bind="@_insurance" style="display: block;  margin: 40px; border-radius: 30px">
+                @foreach (var elem in _placeofworknames)
+                {
+                    <option>@elem.placeofworkname</option>
+                }
+            </select>
+            <b style="display: block;  margin: 40px">Страховая компания:</b>
+            <select class="select-element" @bind="@_placeofwork" style="display: block;  margin: 40px; border-radius: 30px">
+                @foreach (var elements in _insurancecompanynames)
+                {
+                    <option>@elements.insurancecompanyname</option>
+                }
+            </select>
+            <button @onclick="@GetReg">
+            </button>
+        </div>
+    </div>
+}
+
+@code
+{
+    private DateTime _birthday;
+    private DateTime _dataissuemc;
+    private DateTime _dataexpirationinsurancepolisy;
+    private DateTime _policyvalidity;
+    private string? _email;
+    private int _pasportN; 
+    private int _pasportS;
+    private string _urLpath = "http://localhost:5263/api/Controller1/";
+    private string? _gender;
+    private string? _insurance;
+    private string? _phone;
+    private string? _numberpolis;
+    private string? _fio;
+    private string? _placeofwork;
+    private string? _adres;
+    private List<GenderList> _genders = new();
+    private List<PlaceofworknameList> _placeofworknames = new();
+    private List<InsurancecompanynameList> _insurancecompanynames = new();
+    
+    protected override async Task OnInitializedAsync()
+    {
+        HttpResponseMessage responseMessage = await ClientHttpClass.Client.GetAsync($"{_urLpath}GetGender");
+        string elementGender = await responseMessage.Content.ReadAsStringAsync();
+        _genders = JsonConvert.DeserializeObject<List<GenderList>>(elementGender)!.ToList();
+
+        HttpResponseMessage resppons = await ClientHttpClass.Client.GetAsync($"{_urLpath}GetPlaceWork");
+        string elementPlaceWork = await resppons.Content.ReadAsStringAsync();
+        _placeofworknames = JsonConvert.DeserializeObject<List<PlaceofworknameList>>(elementPlaceWork)!.ToList();
+        
+        HttpResponseMessage resp = await ClientHttpClass.Client.GetAsync($"{_urLpath}GetInsuranceCompany");
+        string elementInsurance = await resp.Content.ReadAsStringAsync();
+        _insurancecompanynames = JsonConvert.DeserializeObject<List<InsurancecompanynameList>>(elementInsurance)!.ToList();
+    }
+    
+    private async void GetReg()
+    { 
+        HttpResponseMessage responseMessage = await ClientHttpClass.Client.GetAsync($"http://localhost:5263/api/Controller1/GetReg?email={_email}&numberp={_pasportN}&serialp={_pasportS}&birthday={_birthday}&address={_adres}&phone={_phone}&fio={_fio}&gender={_gender}&dataissuemc={_dataissuemc}&dataexpirationinsurancepolisy={_dataexpirationinsurancepolisy}&numberpolis={_numberpolis}&policyvalidity={_policyvalidity}&placeofworkid={_placeofwork}&insurancecompanyid={_insurance}");
+    }
+    
+    private class GenderList
+    {
+        public string? gendername { get; set; }
+    }
+    private class PlaceofworknameList
+    {
+        public string? placeofworkname { get; set; }
+    }
+    private class InsurancecompanynameList
+    {
+        public string? insurancecompanyname { get; set; }
+    }
+    
+    
+}
