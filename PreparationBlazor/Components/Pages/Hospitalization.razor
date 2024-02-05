@@ -1,0 +1,51 @@
+@page "/Hospitalization"
+@using System.Text.Json.Serialization
+@using Newtonsoft.Json
+@using System.Net.Http.Headers
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+
+@if (_fio == null)
+{
+    <b>...loading</b>
+}
+else
+{
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr">
+        <div style="grid-column: 2; grid-row: 2; display: block">
+            <select>
+                @foreach(var content in _fio)
+                {
+                    <option>@content.fio</option>
+                }
+            </select>
+            <button onclick="@ButtonForReg">Зарегистрировать пациента</button>
+            <input placeholder="Код госпитализации" @bind="_codeHospitali">
+            <InputDate Type="InputDateType.Date"></InputDate>
+            <InputDate Type="InputDateType.Time"></InputDate>
+            
+        </div>
+    </div>
+}
+
+@code {
+    private string _codeHospitali;
+    private List<FioList> _fio = new();
+    protected override async Task OnInitializedAsync()
+    {
+        HttpResponseMessage responseMessage = await ClientHttpClass.Client.GetAsync("http://localhost:5263/api/Patient/GetPatient");
+        string element = await responseMessage.Content.ReadAsStringAsync();
+        _fio = JsonConvert.DeserializeObject<List<FioList>>(element)!.ToList();
+    }
+
+    private void ButtonForReg()
+    {
+        NavigationManager.NavigateTo("/Registration");
+    }
+
+    private class FioList
+    {
+        public string? fio { get; set; }
+    }
+}

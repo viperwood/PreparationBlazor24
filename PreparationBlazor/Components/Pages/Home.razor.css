@@ -1,5 +1,14 @@
-.CastomElement{
+.input{
     display: block;
     margin: 40px;
     border-radius: 30px
+}
+.inputBox{
+    display: block;
+    margin: 40px;
+    border-radius: 15px
+}
+.textInput{
+    display: block;
+    margin: 40px
 }

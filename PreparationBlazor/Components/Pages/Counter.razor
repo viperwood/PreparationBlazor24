@@ -1,20 +1,29 @@
 ﻿@page "/"
 @rendermode InteractiveServer
+@inject NavigationManager NavigationManager
+
 
 <PageTitle>Counter</PageTitle>
+<div style="display: grid; grid-template-rows: 1fr 1fr 1fr; grid-template-columns: 1fr 1fr 1fr">
+    <div style="grid-row: 2; grid-column: 2; display: flex">
+        <button onclick="@RegButton">Registration</button>
+        <button onclick="@HospitalizButton">Hospitalization</button>
+        <button onclick="@RefButton">Referring patients to diagnostic and treatment measures</button>
+    </div>
+</div>
 
-<h1>Counter</h1>
-
-<p role="status">Current count: @currentCount</p>
-
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
-
-@code {
-    private int currentCount = 0;
-
-    private void IncrementCount()
+@code
+{
+    private void RegButton()
     {
-        currentCount++;
+        NavigationManager.NavigateTo("/Registration");
     }
-
+    private void HospitalizButton()
+    {
+        NavigationManager.NavigateTo("/Hospitalization");
+    }
+    private void RefButton()
+    {
+        
+    }
 }

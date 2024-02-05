@@ -202,8 +202,37 @@ main[b-7gnzs1ueas] {
     }
 }
 /* _content/PreparationBlazor/Components/Pages/Home.razor.rz.scp.css */
-.CastomElement[b-yrj9r3tibz]{
+.input[b-yrj9r3tibz]{
     display: block;
     margin: 40px;
     border-radius: 30px
+}
+.inputBox[b-yrj9r3tibz]{
+    display: block;
+    margin: 40px;
+    border-radius: 15px
+}
+.textInput[b-yrj9r3tibz]{
+    display: block;
+    margin: 40px
+}
+/* _content/PreparationBlazor/Components/Pages/Weather.razor.rz.scp.css */
+body[b-otdj3ivlxl]{
+    
+}
+h1[b-otdj3ivlxl]{
+    background: red;
+}
+.QWEASDASSDASDQWE[b-otdj3ivlxl]{
+    background: #ffc107;
+}
+
+#rrrrrrr[b-otdj3ivlxl]{
+    background: #198754;
+    margin: 1000px;
+
+}
+.ddddddd[b-otdj3ivlxl]{
+
+    font-size: 99vw;
 }

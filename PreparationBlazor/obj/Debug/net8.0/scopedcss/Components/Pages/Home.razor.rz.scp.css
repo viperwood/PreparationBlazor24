@@ -1,5 +1,14 @@
-.CastomElement[b-yrj9r3tibz]{
+.input[b-yrj9r3tibz]{
     display: block;
     margin: 40px;
     border-radius: 30px
+}
+.inputBox[b-yrj9r3tibz]{
+    display: block;
+    margin: 40px;
+    border-radius: 15px
+}
+.textInput[b-yrj9r3tibz]{
+    display: block;
+    margin: 40px
 }
