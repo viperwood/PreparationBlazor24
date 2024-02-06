@@ -13,30 +13,56 @@
 else
 {
     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr">
-        <div style="grid-column: 2; grid-row: 2; display: block">
+        <div style="grid-column: 2; grid-row: 2; display: flex; flex-direction: column">
             <select>
                 @foreach(var content in _fio)
                 {
-                    <option>@content.fio</option>
+                    <option>@content.Fio</option>
                 }
             </select>
             <button onclick="@ButtonForReg">Зарегистрировать пациента</button>
             <input placeholder="Код госпитализации" @bind="_codeHospitali">
-            <InputDate Type="InputDateType.Date"></InputDate>
-            <InputDate Type="InputDateType.Time"></InputDate>
-            
+            <button @onclick="CodGet">Подтвердить код</button>
+            <div>
+                @if (test)
+                {
+                    <InputDate Type="InputDateType.Date" @bind-Value="@a" class="input"></InputDate>
+                    <InputDate Type="InputDateType.Time" @bind-Value="@b" class="input"></InputDate>
+                    <button>Далее</button>
+                }
+            </div>
         </div>
     </div>
 }
 
 @code {
+    private DateTime a;
+    private DateTime b;
+    private bool test = false;
     private string _codeHospitali;
+    private HttpResponseMessage responseMessage = new();
     private List<FioList> _fio = new();
+    private List<Hospitolize> _hospitalizations = new();
     protected override async Task OnInitializedAsync()
     {
         HttpResponseMessage responseMessage = await ClientHttpClass.Client.GetAsync("http://localhost:5263/api/Patient/GetPatient");
         string element = await responseMessage.Content.ReadAsStringAsync();
         _fio = JsonConvert.DeserializeObject<List<FioList>>(element)!.ToList();
+    }
+
+    private async void CodGet()
+    {
+        responseMessage = await ClientHttpClass.Client.GetAsync($"http://localhost:5263/api/Hospitalization/GetHospitolization?CODE={Convert.ToInt32(_codeHospitali)}");
+        string contebt = await responseMessage.Content.ReadAsStringAsync();
+        _hospitalizations = JsonConvert.DeserializeObject<List<Hospitolize>>(contebt)!.ToList();
+        if (_hospitalizations.Count() != 0)
+        {
+            test = true;
+        }
+        else
+        {
+            test = false;
+        }
     }
 
     private void ButtonForReg()
@@ -46,6 +72,16 @@ else
 
     private class FioList
     {
-        public string? fio { get; set; }
+        public string? Fio { get; set; }
+    }
+    
+    private class Hospitolize
+    {
+        public string? Conditionsname { get; set; }
+        public string? Departmentname { get; set; }
+        public string? Purposename { get; set; }
+        public string? Fio { get; set; }
+        public DateTime Starthospital { get; set; }
+        public DateTime Endhospital { get; set; }
     }
 }
