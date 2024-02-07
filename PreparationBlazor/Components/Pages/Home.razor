@@ -44,6 +44,7 @@ else
             <input type="email" placeholder="E-mail:" @bind="_registrationModel.email" class="input">
             <b class="textInput">Пол:</b>
             <select class="select-element input" @bind="@_registrationModel.genders">
+                <option value="" selected disabled hidden>Выбор гендера</option>
                 @foreach (var element in _genders)
                 {
                     <option>@element.gendername</option>
@@ -51,6 +52,7 @@ else
             </select>
             <b class="textInput">Место работы:</b>
             <select class="select-element inputBox" @bind="@_registrationModel.placeofworksid">
+                <option value="" selected disabled hidden>Выбор места работы</option>
                 @foreach (var elem in _placeofworknames)
                 {
                     <option>@elem.placeofworkname</option>
@@ -58,6 +60,7 @@ else
             </select>
             <b class="textInput">Страховая компания:</b>
             <select class="select-element inputBox" @bind="@_registrationModel.insurancecompanysid">
+                <option value="" selected disabled hidden>Выбор страховой компании</option>
                 @foreach (var elements in _insurancecompanynames)
                 {
                     <option>@elements.insurancecompanyname</option>

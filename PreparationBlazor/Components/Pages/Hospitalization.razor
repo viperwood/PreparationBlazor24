@@ -14,30 +14,39 @@ else
 {
     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr">
         <div style="grid-column: 2; grid-row: 2; display: flex; flex-direction: column">
-            <select>
-                @foreach(var content in _fio)
+            <select @bind="@_nameUser">
+                <option value="" selected disabled hidden>Выбор пациента</option>
+                @foreach (var content in _fio)
                 {
-                    <option>@content.Fio</option>
+                    <option >@content.Fio</option>
                 }
             </select>
             <button onclick="@ButtonForReg">Зарегистрировать пациента</button>
             <input placeholder="Код госпитализации" @bind="_codeHospitali">
             <button @onclick="CodGet">Подтвердить код</button>
+            
             <div>
                 @if (test)
                 {
-                    <InputDate Type="InputDateType.Date" @bind-Value="@a" class="input"></InputDate>
-                    <InputDate Type="InputDateType.Time" @bind-Value="@b" class="input"></InputDate>
+                    <p>Фио: @_hospitalizations[0].Fio</p>
+                    <p>Отдиление: @_hospitalizations[0].Departmentname</p>
+                    <p>Условия:@_hospitalizations[0].Conditionsname</p>
+                    <p>Цель: @_hospitalizations[0].Purposename</p>
+                    <p>Диагноз: @_hospitalizations[0].Diagnosisname</p>
+                    <p>Срок: @_hospitalizations[0].Lengthhospitalization дн.</p>
+                    <InputDate Type="InputDateType.Date" @bind-Value="@_dateStart" class="input"></InputDate>
+                    <InputDate Type="InputDateType.Time" @bind-Value="@_timeStrat" class="input"></InputDate>
                     <button>Далее</button>
                 }
-            </div>
+            </div>   
         </div>
     </div>
 }
 
 @code {
-    private DateTime a;
-    private DateTime b;
+    private DateTime _dateStart;
+    private string? _nameUser;
+    private DateTime _timeStrat;
     private bool test = false;
     private string _codeHospitali;
     private HttpResponseMessage responseMessage = new();
@@ -52,19 +61,22 @@ else
 
     private async void CodGet()
     {
-        responseMessage = await ClientHttpClass.Client.GetAsync($"http://localhost:5263/api/Hospitalization/GetHospitolization?CODE={Convert.ToInt32(_codeHospitali)}");
-        string contebt = await responseMessage.Content.ReadAsStringAsync();
-        _hospitalizations = JsonConvert.DeserializeObject<List<Hospitolize>>(contebt)!.ToList();
-        if (_hospitalizations.Count() != 0)
+        if (string.IsNullOrEmpty(_codeHospitali) == false && string.IsNullOrEmpty(_nameUser) == false)
         {
-            test = true;
-        }
-        else
-        {
-            test = false;
+            responseMessage = await ClientHttpClass.Client.GetAsync($"http://localhost:5263/api/Hospitalization/GetHospitolization?CODE={Convert.ToInt32(_codeHospitali)}&name={_nameUser}");
+            string contebt = await responseMessage.Content.ReadAsStringAsync();
+            _hospitalizations = JsonConvert.DeserializeObject<List<Hospitolize>>(contebt)!.ToList();
+            if (_hospitalizations.Count() != 0)
+            {
+                test = true;
+                /*_dateStart.AddHours(_timeStrat.Hour).AddMinutes(_timeStrat.Minute);*/
+            }
+            else
+            {
+                test = false;
+            }
         }
     }
-
     private void ButtonForReg()
     {
         NavigationManager.NavigateTo("/Registration");
@@ -81,7 +93,7 @@ else
         public string? Departmentname { get; set; }
         public string? Purposename { get; set; }
         public string? Fio { get; set; }
-        public DateTime Starthospital { get; set; }
-        public DateTime Endhospital { get; set; }
+        public string? Diagnosisname { get; set; }
+        public string? Lengthhospitalization { get; set; }
     }
 }
