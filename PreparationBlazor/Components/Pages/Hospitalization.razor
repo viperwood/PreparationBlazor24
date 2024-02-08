@@ -1,55 +1,58 @@
 @page "/Hospitalization"
-@using System.Text.Json.Serialization
 @using Newtonsoft.Json
-@using System.Net.Http.Headers
+@using PreparationBlazor.Components.Models
 @inject NavigationManager NavigationManager
 @rendermode InteractiveServer
 
 
-@if (_fio == null)
-{
-    <b>...loading</b>
-}
-else
-{
-    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr">
-        <div style="grid-column: 2; grid-row: 2; display: flex; flex-direction: column">
-            <select @bind="@_nameUser">
-                <option value="" selected disabled hidden>Выбор пациента</option>
-                @foreach (var content in _fio)
-                {
-                    <option >@content.Fio</option>
-                }
-            </select>
-            <button onclick="@ButtonForReg">Зарегистрировать пациента</button>
-            <input placeholder="Код госпитализации" @bind="_codeHospitali">
-            <button @onclick="CodGet">Подтвердить код</button>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr">
+    <div style="grid-column: 2; grid-row: 2; display: flex; flex-direction: column">
+        <select @bind="@_nameUser">
+            <option value="" selected disabled hidden>Выбор пациента</option>
+            @foreach (var content in _fio)
+            {
+                <option >@content.Fio</option>
+            }
+        </select>
+        <button @onclick="ButtonForReg">Зарегистрировать пациента</button>
+        <input placeholder="Код госпитализации" @bind="_codeHospitali">
+        <button @onclick="CodGet">Подтвердить код</button>
             
-            <div>
-                @if (test)
+        <div>
+            @if (_errore)
+            {
+                <p>Фио: @_hospitalizations[0].Fio</p>
+                <p>Отдиление: @_hospitalizations[0].Departmentname</p>
+                <p>Условия:@_hospitalizations[0].Conditionsname</p>
+                <p>Цель: @_hospitalizations[0].Purposename</p>
+                <p>Диагноз: @_hospitalizations[0].Diagnosisname</p>
+                <p>Срок: @_hospitalizations[0].Lengthhospitalization дн.</p>
+                <InputDate Type="InputDateType.Date" @bind-Value="@_dateStart" class="input"></InputDate>
+                <InputDate Type="InputDateType.Time" @bind-Value="@_timeStrat" class="input"></InputDate>
+                <button @onclick="RegHospitalization">Далее</button>
+                @if (_erroreHttp)
                 {
-                    <p>Фио: @_hospitalizations[0].Fio</p>
-                    <p>Отдиление: @_hospitalizations[0].Departmentname</p>
-                    <p>Условия:@_hospitalizations[0].Conditionsname</p>
-                    <p>Цель: @_hospitalizations[0].Purposename</p>
-                    <p>Диагноз: @_hospitalizations[0].Diagnosisname</p>
-                    <p>Срок: @_hospitalizations[0].Lengthhospitalization дн.</p>
-                    <InputDate Type="InputDateType.Date" @bind-Value="@_dateStart" class="input"></InputDate>
-                    <InputDate Type="InputDateType.Time" @bind-Value="@_timeStrat" class="input"></InputDate>
-                    <button>Далее</button>
+                    <p style="color: green">Регистрация завершина</p>
                 }
-            </div>   
-        </div>
+                else
+                {
+                    <p style="color: red">Регистрация провалена</p>
+                }
+            }
+        </div>   
     </div>
-}
+</div>
 
 @code {
     private DateTime _dateStart;
     private string? _nameUser;
     private DateTime _timeStrat;
-    private bool test = false;
-    private string _codeHospitali;
-    private HttpResponseMessage responseMessage = new();
+    private bool _errore;
+    private bool _erroreHttp;
+    private HttpResponseMessage _respMessage = new();
+    private string? _codeHospitali;
+    private HttpResponseMessage _responseMessage = new();
     private List<FioList> _fio = new();
     private List<Hospitolize> _hospitalizations = new();
     protected override async Task OnInitializedAsync()
@@ -63,20 +66,30 @@ else
     {
         if (string.IsNullOrEmpty(_codeHospitali) == false && string.IsNullOrEmpty(_nameUser) == false)
         {
-            responseMessage = await ClientHttpClass.Client.GetAsync($"http://localhost:5263/api/Hospitalization/GetHospitolization?CODE={Convert.ToInt32(_codeHospitali)}&name={_nameUser}");
-            string contebt = await responseMessage.Content.ReadAsStringAsync();
+            _responseMessage = await ClientHttpClass.Client.GetAsync($"http://localhost:5263/api/Hospitalization/GetHospitolization?CODE={Convert.ToInt32(_codeHospitali)}&name={_nameUser}");
+            string contebt = await _responseMessage.Content.ReadAsStringAsync();
             _hospitalizations = JsonConvert.DeserializeObject<List<Hospitolize>>(contebt)!.ToList();
             if (_hospitalizations.Count() != 0)
             {
-                test = true;
-                /*_dateStart.AddHours(_timeStrat.Hour).AddMinutes(_timeStrat.Minute);*/
+                _errore = true;
             }
             else
             {
-                test = false;
+                _errore = false;
             }
         }
     }
+
+    private async Task RegHospitalization()
+    {
+        _dateStart = _dateStart.AddHours(_timeStrat.Hour).AddMinutes(_timeStrat.Minute);
+        DataHospitalization dataHospitalization = new();
+        dataHospitalization.DateSatrtHosp = _dateStart;
+        dataHospitalization.CodeHospitaliz = Convert.ToInt32(_codeHospitali);
+        _respMessage = await ClientHttpClass.Client.PostAsJsonAsync("http://localhost:5263/api/RegistrateHospitalization/PostRegHospitalize", dataHospitalization);
+        _erroreHttp = _respMessage.IsSuccessStatusCode;
+    }
+   
     private void ButtonForReg()
     {
         NavigationManager.NavigateTo("/Registration");
@@ -84,16 +97,13 @@ else
 
     private class FioList
     {
+        public FioList(string? fio)
+        {
+            Fio = fio;
+        }
+
         public string? Fio { get; set; }
     }
     
-    private class Hospitolize
-    {
-        public string? Conditionsname { get; set; }
-        public string? Departmentname { get; set; }
-        public string? Purposename { get; set; }
-        public string? Fio { get; set; }
-        public string? Diagnosisname { get; set; }
-        public string? Lengthhospitalization { get; set; }
-    }
+    
 }

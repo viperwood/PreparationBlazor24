@@ -1,0 +1,75 @@
+@page "/ChackHospitalization"
+@using PreparationBlazor.Components.Models
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+@using Newtonsoft.Json
+
+<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr">
+    <div style="display: flex; flex-direction: column; grid-column: 2; grid-row: 2">
+        <h3>Hospitalization info</h3>
+        <input @bind="@_numberCode">
+        <button @onclick="@HospitalizationInfo">Поиск</button>
+        @if (_hospitolizeInfo.Count != 0)
+        {
+            <p>Фио: @_hospitolizeInfo[0].Fio</p>
+            <p>Диагноз: @_hospitolizeInfo[0].Diagnosisname</p>
+            <p>Условия: @_hospitolizeInfo[0].Conditionsname</p>
+            @if (_hospitolizeInfo[0].Cancellation != null)
+            {
+                <p>Отмена: @_hospitolizeInfo[0].Cancellation</p>   
+            }
+            <p>Отделение: @_hospitolizeInfo[0].Departmentname</p>
+            <p>Срок госпитолизации в днях: @_hospitolizeInfo[0].Lengthhospitalization</p>
+            <p>Цель: @_hospitolizeInfo[0].Purposename</p>
+            @if (_hospitolizeInfo[0].Refusal != false)
+            {
+                <p>Отказ: Вы отказались от госпитализации</p>
+            }
+            @if (_hospitolizeInfo[0].Starthospital != null)
+            {
+                <p>Дата начала госпитолизации: @_hospitolizeInfo[0].Starthospital</p>
+            }
+            else
+            {
+                <p>Дата начала госпитолизации: Вы пока не выбрали время госпитолизации</p>
+                <button @onclick="RegHospitolizationButton">Зарегистьрировать госпитолизацию</button>
+            }
+            <button @onclick="RefusalButton">Отказ</button>
+            <input @bind="_cancellation" type="text">
+            <button @onclick="CancellationButton">Отмена</button>
+        }
+    </div>
+</div>
+
+@code {
+    private string? _numberCode;
+    private string? _cancellation;
+    private List<Hospitolize> _hospitolizeInfo = new();
+    private async Task HospitalizationInfo()
+    {
+        if (string.IsNullOrEmpty(_numberCode) != true)
+        {
+            HttpResponseMessage responseMessage = await ClientHttpClass.Client.GetAsync($"http://localhost:5263/api/HospitalizationInfo/GethospitalizationInfo?code={_numberCode}");
+            string content = await responseMessage.Content.ReadAsStringAsync();
+            _hospitolizeInfo = JsonConvert.DeserializeObject<List<Hospitolize>>(content)!.ToList();
+        }
+    }
+    
+    private void RefusalButton()
+    {
+        
+    }
+    
+    private void CancellationButton()
+    {
+        if (string.IsNullOrEmpty(_cancellation))
+        {
+            
+        }
+    }
+    
+    private void RegHospitolizationButton()
+    {
+        NavigationManager.NavigateTo("/Hospitalization");
+    }
+}

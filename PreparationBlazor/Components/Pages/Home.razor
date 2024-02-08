@@ -1,7 +1,6 @@
 ﻿@page "/Registration"
-@using System.Text.Json.Serialization
 @using Newtonsoft.Json
-@using System.Net.Http.Headers
+@using PreparationBlazor.Components.Models
 @rendermode InteractiveServer
 
 
@@ -9,70 +8,64 @@
 
 
 
-@if (_genders == null)
-{
-    <b>...Loading</b>
-}
-else
-{
-    <div style="display: grid; grid-template-rows: 20vh 1fr 20vh; grid-template-columns: 1fr 1fr 1fr; background: linear-gradient(to top, blue, rebeccapurple)">
-        <div style="grid-row: 1; grid-column: 2; display: flex; text-align: center; vertical-align: center">
-            <h3 style="color: white; margin: auto">Регистрация</h3>
-        </div>
-        <div style="grid-column: 2; grid-row: 2; display: block; background: white; border-radius: 100px;">
-            <b class="textInput">ФИО:</b>
-            <input placeholder="ФИО:" @bind="_registrationModel.fio" class="input">
-            <b class="textInput">Серия паспорта:</b>
-            <input placeholder="Серия паспорта:" @bind="_registrationModel.serialp" class="input">
-            <b class="textInput">Номер паспорта:</b>
-            <input placeholder="Номер паспорта:" @bind="_registrationModel.numberp" class="input">
-            <b class="textInput">Номер полиса:</b>
-            <input placeholder="Номер полиса:" @bind="_registrationModel.numberpolis" class="input">
-            <b class="textInput">День рождения</b>
-            <InputDate Type="InputDateType.Date" @bind-Value="@_registrationModel.birthday" class="input"/>
-            <b class="textInput">Дата окончания действия страхового полиса пациента</b>
-            <InputDate Type="InputDateType.Date" @bind-Value="@_registrationModel.dataexpirationinsurancepolisy" class="input"/>
-            <b class="textInput">Срок действия медецинского полиса</b>
-            <InputDate Type="InputDateType.Date" @bind-Value="@_registrationModel.policyvalidity" class="input"/>
-            <b class="textInput">Дата выдачи медицинской карты пациента</b>
-            <InputDate Type="InputDateType.Date" @bind-Value="@_registrationModel.dataissuemc" class="input"/>
-            <b class="textInput">Адрес:</b>
-            <input placeholder="Адрес:" @bind="_registrationModel.address" class="input">
-            <b class="textInput">Телефон:</b>
-            <input placeholder="Телефон:" @bind="_registrationModel.phone" class="input">
-            <b class="textInput">email:</b>
-            <input type="email" placeholder="E-mail:" @bind="_registrationModel.email" class="input">
-            <b class="textInput">Пол:</b>
-            <select class="select-element input" @bind="@_registrationModel.genders">
-                <option value="" selected disabled hidden>Выбор гендера</option>
-                @foreach (var element in _genders)
-                {
-                    <option>@element.gendername</option>
-                }
-            </select>
-            <b class="textInput">Место работы:</b>
-            <select class="select-element inputBox" @bind="@_registrationModel.placeofworksid">
-                <option value="" selected disabled hidden>Выбор места работы</option>
-                @foreach (var elem in _placeofworknames)
-                {
-                    <option>@elem.placeofworkname</option>
-                }
-            </select>
-            <b class="textInput">Страховая компания:</b>
-            <select class="select-element inputBox" @bind="@_registrationModel.insurancecompanysid">
-                <option value="" selected disabled hidden>Выбор страховой компании</option>
-                @foreach (var elements in _insurancecompanynames)
-                {
-                    <option>@elements.insurancecompanyname</option>
-                }
-            </select>
-            <button type="submit" @onclick="GetReg" class="inputBox">
-                Зарегестрировать
-            </button>
-            <b>@_a</b>
-        </div>
+
+<div style="display: grid; grid-template-rows: 20vh 1fr 20vh; grid-template-columns: 1fr 1fr 1fr; background: linear-gradient(to top, blue, rebeccapurple)">
+    <div style="grid-row: 1; grid-column: 2; display: flex; text-align: center; vertical-align: center">
+        <h3 style="color: white; margin: auto">Регистрация</h3>
     </div>
-}
+    <div style="grid-column: 2; grid-row: 2; display: block; background: white; border-radius: 100px;">
+        <b class="textInput">ФИО:</b>
+        <input placeholder="ФИО:" @bind="_registrationModel.Fio" class="input">
+        <b class="textInput">Серия паспорта:</b>
+        <input placeholder="Серия паспорта:" @bind="_registrationModel.Serialp" class="input">
+        <b class="textInput">Номер паспорта:</b>
+        <input placeholder="Номер паспорта:" @bind="_registrationModel.Numberp" class="input">
+        <b class="textInput">Номер полиса:</b>
+        <input placeholder="Номер полиса:" @bind="_registrationModel.Numberpolis" class="input">
+        <b class="textInput">День рождения</b>
+        <InputDate Type="InputDateType.Date" @bind-Value="@_registrationModel.Birthday" class="input"/>
+        <b class="textInput">Дата окончания действия страхового полиса пациента</b>
+        <InputDate Type="InputDateType.Date" @bind-Value="@_registrationModel.Dataexpirationinsurancepolisy" class="input"/>
+        <b class="textInput">Срок действия медецинского полиса</b>
+        <InputDate Type="InputDateType.Date" @bind-Value="@_registrationModel.Policyvalidity" class="input"/>
+        <b class="textInput">Дата выдачи медицинской карты пациента</b>
+        <InputDate Type="InputDateType.Date" @bind-Value="@_registrationModel.Dataissuemc" class="input"/>
+        <b class="textInput">Адрес:</b>
+        <input placeholder="Адрес:" @bind="_registrationModel.Address" class="input">
+        <b class="textInput">Телефон:</b>
+        <input placeholder="Телефон:" @bind="_registrationModel.Phone" class="input">
+        <b class="textInput">email:</b>
+        <input type="email" placeholder="E-mail:" @bind="_registrationModel.Email" class="input">
+        <b class="textInput">Пол:</b>
+        <select class="select-element input" @bind="@_registrationModel.Genders">
+            <option value="" selected disabled hidden>Выбор гендера</option>
+            @foreach (var element in _genders)
+            {
+                <option>@element.Gendername</option>
+            }
+        </select>
+        <b class="textInput">Место работы:</b>
+        <select class="select-element inputBox" @bind="@_registrationModel.Placeofworksid">
+            <option value="" selected disabled hidden>Выбор места работы</option>
+            @foreach (var elem in _placeofworknames)
+            {
+                <option>@elem.Placeofworkname</option>
+            }
+        </select>
+        <b class="textInput">Страховая компания:</b>
+        <select class="select-element inputBox" @bind="@_registrationModel.Insurancecompanysid">
+            <option value="" selected disabled hidden>Выбор страховой компании</option>
+            @foreach (var elements in _insurancecompanynames)
+            {
+                <option>@elements.Insurancecompanyname</option>
+            }
+        </select>
+        <button type="submit" @onclick="GetReg" class="inputBox">
+            Зарегестрировать
+        </button>
+        <b>@_a</b>
+    </div>
+</div>
 @code
 {
     RegistrationModel _registrationModel = new();
@@ -108,15 +101,30 @@ else
     
     private class GenderList
     {
-        public string? gendername { get; set; }
+        public GenderList(string? gendername)
+        {
+            Gendername = gendername;
+        }
+
+        public string? Gendername { get; set; }
     }
     private class PlaceofworknameList
     {
-        public string? placeofworkname { get; set; }
+        public PlaceofworknameList(string? placeofworkname)
+        {
+            Placeofworkname = placeofworkname;
+        }
+
+        public string? Placeofworkname { get; set; }
     }
     private class InsurancecompanynameList
     {
-        public string? insurancecompanyname { get; set; }
+        public InsurancecompanynameList(string? insurancecompanyname)
+        {
+            Insurancecompanyname = insurancecompanyname;
+        }
+
+        public string? Insurancecompanyname { get; set; }
     }
     
     
