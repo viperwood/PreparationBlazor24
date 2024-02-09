@@ -55,16 +55,21 @@
         }
     }
     
-    private void RefusalButton()
+    private async Task RefusalButton()
     {
-        
+        await ClientHttpClass.Client.GetAsync($"http://localhost:5263/api/Refusal/GetRefusal?code={_numberCode}");
+        await HospitalizationInfo();
     }
     
-    private void CancellationButton()
+    private async Task CancellationButton()
     {
-        if (string.IsNullOrEmpty(_cancellation))
+        if (string.IsNullOrEmpty(_cancellation) != true)
         {
-            
+            CancellationInfoModel cancellationInfoModel = new CancellationInfoModel();
+            cancellationInfoModel.Code = _numberCode;
+            cancellationInfoModel.Description = _cancellation;
+            await ClientHttpClass.Client.PostAsJsonAsync("http://localhost:5263/api/Cancellation/PostCancellation", cancellationInfoModel);
+            await HospitalizationInfo();
         }
     }
     
